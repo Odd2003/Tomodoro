@@ -41,7 +41,8 @@ struct MusicView: View {
                     }
                 }
             }
-        }.scrollContentBackground(.hidden).background(.orange)
+        }
+        .scrollContentBackground(.hidden).background(.milky)
     }
     
 }

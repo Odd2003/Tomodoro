@@ -45,6 +45,13 @@ class SongList {
             Song(name: "Fun Pop", genre: Genre.popGenre, favourite: false),
             Song(name: "TavC City Stroll", genre: Genre.popGenre, favourite: false),
             Song(name: "Upbeat Cher", genre: Genre.popGenre, favourite: false),
+            Song(name: "Good Night", genre: Genre.lofiGenre, favourite: false),
+            Song(name: "Cute Japan", genre: Genre.lofiGenre, favourite: false),
+            Song(name: "Gentle Rain", genre: Genre.whiteNoise, favourite: false),
+            Song(name: "December Rain", genre: Genre.lofiGenre, favourite: false),
+            Song(name: "Fun Pop", genre: Genre.popGenre, favourite: false),
+            Song(name: "TavC City Stroll", genre: Genre.popGenre, favourite: false),
+            Song(name: "Upbeat Cher", genre: Genre.popGenre, favourite: false),
         ]
     }
     

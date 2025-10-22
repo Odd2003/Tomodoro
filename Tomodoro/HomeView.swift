@@ -19,36 +19,80 @@ struct HomeView: View {
     @State var timer: Timer?
     
     @State var rating: Int = 5
+    
+    @State var progress: Float = 0.0
+    
+    @Namespace private var namespace
 
     var body: some View {
-        Color.accent.overlay {
-            VStack(spacing: -4) {
+        Color.milky.overlay {
+            Image("Pattern")
+                .resizable(resizingMode: .tile)
+                .opacity(0.1)
+            
+            VStack(spacing: 0) {
                 Text(isBreak ? "Break" : "Focus")
-                    .foregroundStyle(.white)
-                    .font(.system(size: 72))
-                    .offset(y: -30)
+                    .foregroundStyle(.black)
+                    .font(.system(size: 50))
                     .id(isBreak)
+                    .padding(.horizontal, 16)
+                    .glassEffect(in: .rect(cornerRadius: 16.0))
                     .transition(.opacity.combined(with: .scale))
-
-                Image("PomodoroImage")
-                    .resizable()
-                    .frame(width: 265, height: 300)
-                    .overlay {
-                        Button {
-                            isRunning ? stop() : start()
-                        } label: {
-                            Image(systemName: isRunning ? "pause.circle" : "play.circle")
-                                .font(.system(size: 100))
-                                .foregroundStyle(.accent)
-                                .offset(y: 20)
-                        }
-                    }
+                    .offset(y: -50)
                 
+                ZStack {
+                    // Gray circle
+                    Circle()
+                        .stroke(lineWidth: 30.0)
+                        .opacity(0.3)
+                        .foregroundColor(.black)
+                    //                            .glassEffect(.regular.tint(.orange))
+                    
+                    // Orange circle
+                    Circle()
+                        .trim(from: 0.0, to: CGFloat(min(progress, 1.0)))
+                        .stroke(style: StrokeStyle(lineWidth: 25.0,
+                                                   lineCap: .round, lineJoin: .round))
+                        .foregroundColor(Color.accent)
+                    // Ensures the animation starts from 12 o'clock
+                        .rotationEffect(Angle(degrees: 270))
+                    
+                    
                     Text(String(format: "%02d:%02d", timeRemaining / 60, timeRemaining % 60))
-                        .frame(width: 195, alignment: .leading)
-                        .foregroundStyle(.white)
-                        .font(.system(size: 72))
+                        .foregroundStyle(.black)
+                        .font(.system(size: 40))
+                        .padding(.horizontal, 10)
                         .contentTransition(.numericText(value: Double(timeRemaining)))
+                        .glassEffect(in: .rect(cornerRadius: 16.0))
+                        .padding()
+                    
+                    
+                }
+                .padding(.horizontal, 60)
+                
+                Button(isRunning ? "Pause" : "Start") {
+                    withAnimation {
+                        isRunning ? stop() : start()
+                    }
+                }
+                .foregroundColor(.white)
+                .font(.system(size: 30))
+                .buttonStyle(.glass(.regular.tint(.accent).interactive()))
+                .offset(y: 50)
+                
+                //                Circle()
+                //                    .foregroundColor(.gray)
+                //                    .frame(width: 265, height: 300)
+                //                    .overlay {
+                //                        Button {
+                //                            isRunning ? stop() : start()
+                //                        } label: {
+                //                            Image(systemName: isRunning ? "pause.circle" : "play.circle")
+                //                                .font(.system(size: 100))
+                //                                .foregroundStyle(.accent)                        }
+                //                    }
+                
+                
                 
             }
             .offset(y: -50)
@@ -58,16 +102,76 @@ struct HomeView: View {
             Button {
                 isSheetVisible.toggle()
             } label: {
-                RoundedRectangle(cornerRadius: 28)
-                    .foregroundStyle(Material.thin)
-                    .frame(height: 76)
-                    .shadow(radius: 5, y: 3)
-                    .padding(.horizontal, 33)
-                    .padding(.bottom)
+                ZStack {
+                    
+                    HStack {
+                        HStack {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .foregroundColor(Color("Gray"))
+                                
+                                Image("Music")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 20)
+                                    .offset(x: -1)
+                            }
+                            .frame(width: 30, height: 30)
+                            
+                            Text("Not Playing")
+                                .foregroundStyle(.black)
+                                .font(.system(size: 14))
+                        }
+                        
+                        Spacer()
+                        
+                        HStack {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.black)
+                            
+                            Spacer()
+                            
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(.black)
+                                .opacity(0.5)
+                        }
+                        .frame(width: 75)
+                    }
+                    .padding(.horizontal, 25)
+                }
+                .foregroundStyle(.white)
+                .frame(height: 52)
+                .glassEffect()
+                .padding(.horizontal, 18)
+                .matchedTransitionSource(id: "zoom", in: namespace)
             }
+            .offset(y: -10)
+            
         }
         .sheet(isPresented: $isSheetVisible) {
-            EmptyView()
+            VStack(alignment: .trailing) {
+                
+                Button {
+                    isSheetVisible.toggle()
+                } label: {
+                    Image(systemName: "xmark.circle")
+                        .foregroundStyle(Color(.black))
+                        .font(.system(size: 24))
+                }
+                .padding(.top, 30)
+                .padding(.trailing, 30)
+                MusicView()
+            }.background(.milky)
+            
+//            NavigationStack {
+//                MusicView()
+//            }
+//            .matchedTransitionSource(id: "zoom", in: namespace)
+//            .navigationTransition(.zoom(sourceID: "zoom", in: namespace))
+//            .background(.milky)
+            
         }
     }
 
@@ -77,6 +181,7 @@ struct HomeView: View {
             if timeRemaining > 0 {
                 withAnimation {
                     timeRemaining -= 1
+                    progress = 1 - (Float(timeRemaining) / Float(isBreak ? breakTime : focusTime))
                 }
             } else {
                 stop()
