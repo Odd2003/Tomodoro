@@ -13,7 +13,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selection) {
             Tab("Statistics", systemImage: "chart.xyaxis.line", value: 0) {
-                EmptyView()
+                StatisticsTabView()
             }
 
             Tab("Home", systemImage: "house", value: 1) {
