@@ -21,7 +21,7 @@ struct ContentView: View {
             }
 
             Tab("PomoLand", systemImage: "mountain.2", value: 2) {
-                EmptyView()
+                PomoLandView()
             }
         }
     }
