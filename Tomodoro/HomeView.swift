@@ -23,6 +23,8 @@ struct HomeView: View {
     @State var progress: Float = 0.0
     
     @Namespace private var namespace
+    
+    
 
     var body: some View {
         Color.milky.overlay {
@@ -41,12 +43,10 @@ struct HomeView: View {
                     .offset(y: -50)
                 
                 ZStack {
-                    // Gray circle
                     Circle()
                         .stroke(lineWidth: 30.0)
                         .opacity(0.3)
                         .foregroundColor(.black)
-                    //                            .glassEffect(.regular.tint(.orange))
                     
                     // Orange circle
                     Circle()
@@ -79,20 +79,6 @@ struct HomeView: View {
                 .font(.system(size: 30))
                 .buttonStyle(.glass(.regular.tint(.accent).interactive()))
                 .offset(y: 50)
-                
-                //                Circle()
-                //                    .foregroundColor(.gray)
-                //                    .frame(width: 265, height: 300)
-                //                    .overlay {
-                //                        Button {
-                //                            isRunning ? stop() : start()
-                //                        } label: {
-                //                            Image(systemName: isRunning ? "pause.circle" : "play.circle")
-                //                                .font(.system(size: 100))
-                //                                .foregroundStyle(.accent)                        }
-                //                    }
-                
-                
                 
             }
             .offset(y: -50)
@@ -165,13 +151,6 @@ struct HomeView: View {
                 MusicView()
             }.background(.milky)
             
-//            NavigationStack {
-//                MusicView()
-//            }
-//            .matchedTransitionSource(id: "zoom", in: namespace)
-//            .navigationTransition(.zoom(sourceID: "zoom", in: namespace))
-//            .background(.milky)
-            
         }
     }
 
@@ -203,10 +182,3 @@ struct HomeView: View {
 #Preview {
     ContentView()
 }
-
-//                        .background(
-//                            Image(systemName: "play.circle")
-//                                .font(.system(size: 100))
-//                                .foregroundStyle(.black)
-//                                .scaleEffect(1.05)
-//                        )

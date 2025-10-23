@@ -7,7 +7,7 @@
 
 import SwiftUI
 import AVFoundation
-var player: AVAudioPlayer?	
+var player: AVAudioPlayer?
 
 struct MusicView: View {
     

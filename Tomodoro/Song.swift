@@ -37,7 +37,6 @@ class SongList {
     
     init() {
         songs = [
-            
             Song(name: "Good Night", genre: Genre.lofiGenre, favourite: false),
             Song(name: "Cute Japan", genre: Genre.lofiGenre, favourite: false),
             Song(name: "Gentle Rain", genre: Genre.whiteNoise, favourite: false),
