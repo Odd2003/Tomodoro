@@ -26,9 +26,9 @@ struct HomeView: View {
 
     var body: some View {
         Color.milky.overlay {
-            Image("Pattern")
-                .resizable(resizingMode: .tile)
-                .opacity(0.1)
+            Image("Pattern2")
+                .resizable().scaledToFit()
+                .opacity(0.3)
             
             VStack(spacing: 0) {
                 Text(isBreak ? "Break" : "Focus")
