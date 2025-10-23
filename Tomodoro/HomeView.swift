@@ -24,7 +24,7 @@ struct HomeView: View {
     
     @Namespace private var namespace
     
-    
+    var songPlayer: AudioService
 
     var body: some View {
         Color.milky.overlay {
@@ -104,7 +104,7 @@ struct HomeView: View {
                             }
                             .frame(width: 30, height: 30)
                             
-                            Text("Not Playing")
+                            Text(songPlayer.currentSong ?? "Not Playing")
                                 .foregroundStyle(.black)
                                 .font(.system(size: 14))
                         }
@@ -112,9 +112,25 @@ struct HomeView: View {
                         Spacer()
                         
                         HStack {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 24))
-                                .foregroundColor(.black)
+                            Button {
+                                if songPlayer.isPlaying {
+                                    songPlayer.pause()
+                                } else {
+                                    // If we already have a selected song, resume it from saved time,
+                                    // otherwise do nothing (or select a default song if desired).
+                                    if let current = songPlayer.currentSong {
+                                        songPlayer.playSong(name: current) // will resume at saved time
+                                    } else {
+                                        // Optionally choose a default track here if needed
+                                        // e.g., songPlayer.playSong(name: "Good Night")
+                                        songPlayer.resume() // no-op if no player yet
+                                    }
+                                }
+                            } label: {
+                                Image(systemName: songPlayer.isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.black)
+                            }
                             
                             Spacer()
                             
@@ -148,7 +164,7 @@ struct HomeView: View {
                 }
                 .padding(.top, 30)
                 .padding(.trailing, 30)
-                MusicView()
+                MusicView(songPlayer: songPlayer)
             }.background(.milky)
             
         }
@@ -182,3 +198,4 @@ struct HomeView: View {
 #Preview {
     ContentView()
 }
+

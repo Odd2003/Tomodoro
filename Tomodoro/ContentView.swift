@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selection = 1
+    @State var songPlayer = AudioService()
 
     var body: some View {
         TabView(selection: $selection) {
@@ -17,7 +18,7 @@ struct ContentView: View {
             }
 
             Tab("Home", systemImage: "house", value: 1) {
-                HomeView()
+                HomeView(songPlayer: songPlayer)
             }
 
             Tab("PomoLand", systemImage: "mountain.2", value: 2) {
