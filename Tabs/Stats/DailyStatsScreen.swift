@@ -13,7 +13,7 @@ struct DailyStatsScreen: View {
     @ObservedObject var vm: StatsViewModel
     @State private var hoveredDay: Date?      // currently tapped / dragged day
 
-    private let listTopNudge: CGFloat = 30    // adjust only the list position
+    private let listTopNudge: CGFloat = 12    // tighter gap since no card now
 
     // MARK: - Precomputed data
     private var anchors: [Date] { vm.last7Days }            // 7 days (oldest → newest)
@@ -27,15 +27,16 @@ struct DailyStatsScreen: View {
     // MARK: - BODY
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 chartSection
                 listSection
-                Color.clear.frame(height: 70)
+                // no bottom spacer – we want content to reach the edge
             }
             .padding(.top, 16)
         }
-        .contentMargins(.bottom, -30, for: .scrollContent)
-        .safeAreaInset(edge: .bottom) { Color.clear.frame(height: 10) }
+        // let scroll content come close to the bottom edge
+        .contentMargins(.bottom, 0, for: .scrollContent)
+        .ignoresSafeArea(.container, edges: .bottom)   // <- THIS lets the list run under the tab bar
         .background(AppTheme.canvas)
     }
 
@@ -115,7 +116,6 @@ struct DailyStatsScreen: View {
                             }
                         }
                     }
-
                     // Overlay gesture for tap/drag detection
                     .chartOverlay { proxy in
                         GeometryReader { geo in
@@ -138,10 +138,6 @@ struct DailyStatsScreen: View {
                                                 }
                                             }
                                         }
-                                        .onEnded { _ in
-                                            // keep selected, or uncomment below to clear
-                                            // hoveredDay = nil
-                                        }
                                 )
                         }
                     }
@@ -153,50 +149,46 @@ struct DailyStatsScreen: View {
         }
     }
 
-    // MARK: - LIST SECTION
+    // MARK: - LIST SECTION (no white card background)
     private var listSection: some View {
-        StatsCardContent {
+        VStack(spacing: 0) {
             if vm.sessions.isEmpty {
                 Text("No sessions yet. Start a timer on the main tab.")
                     .foregroundStyle(AppTheme.textSecondary)
                     .padding(.vertical, 24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 20)
             } else {
-                VStack(spacing: 0) {
-                    ForEach(vm.sessionsGroupedByDay, id: \.day) { day, items in
-                        // Day header
+                ForEach(vm.sessionsGroupedByDay, id: \.day) { day, items in
+                    // Day header
+                    HStack {
+                        Text(day, format: .dateTime.weekday(.wide).day().month())
+                            .font(.system(size: 14, weight: .semibold))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, listTopNudge)
+
+                    // Sessions for that day — numbered
+                    ForEach(Array(items.enumerated()), id: \.element.id) { idx, s in
                         HStack {
-                            Text(day, format: .dateTime.weekday(.wide).day().month())
-                                .font(.system(size: 14, weight: .semibold))
-                                .offset(x: -8)
+                            Text("Session \(idx + 1)")
+                                .foregroundStyle(AppTheme.bar)
                             Spacer()
+                            Text("\(s.minutes) min")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
+                        .padding(.horizontal, 20)
+                        .frame(height: 44)
 
-                        // Sessions for that day — numbered
-                        ForEach(Array(items.enumerated()), id: \.element.id) { idx, s in
-                            HStack {
-                                Text("Session \(idx + 1)")
-                                    .foregroundStyle(AppTheme.bar)
-
-                                Spacer()
-
-                                Text("\(s.minutes) min")
-                                    .foregroundStyle(.secondary)
-                                    .monospacedDigit()
-                            }
-                            .padding(.horizontal, 16)
-                            .frame(height: 44)
-
-                            Divider().overlay(AppTheme.divider)
-                        }
+                        Divider().overlay(AppTheme.divider)
+                            .padding(.leading, 20) // keeps a nice inset divider
                     }
                 }
+               
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, listTopNudge)
-        .padding(.bottom, 5)
     }
 }
 
@@ -213,28 +205,15 @@ struct CalloutTag: View {
             .font(.caption)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(                       // Both layers *behind* text
+            .background(
                 ZStack {
                     Capsule().fill(Color(.systemBackground).opacity(baseOpacity))
                     Capsule().fill(.ultraThinMaterial)
                 }
             )
-            .foregroundColor(textColor)         // Explicit text color
+            .foregroundColor(textColor)
             .compositingGroup()
             .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
             .zIndex(1)
-    }
-}
-
-//
-// MARK: - Shared card container
-//
-struct StatsCardContent<Content: View>: View {
-    @ViewBuilder var content: Content
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) { content }
-            .background(AppTheme.card)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 6)
     }
 }

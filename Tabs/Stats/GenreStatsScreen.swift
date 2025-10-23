@@ -33,7 +33,6 @@ struct GenreStatsScreen: View {
     var body: some View {
         // Build a genre → minutes map from VM
         let dict = Dictionary(uniqueKeysWithValues: vm.genresWithMinutes.map { ($0.genre, $0.minutes) })
-        // Always three rows, in the same order
         let rows: [(genre: String, minutes: Int)] = palette.map { ($0, dict[$0] ?? 0) }
         let total = rows.reduce(0) { $0 + $1.minutes }
         let average = rows.isEmpty ? 0 : Double(total) / Double(rows.count)
@@ -72,7 +71,7 @@ struct GenreStatsScreen: View {
                         }
                         .chartYScale(domain: 0...Double(yMax))
                         .chartYAxis(.hidden)
-                        .chartXScale(domain: palette) // lock categorical order
+                        .chartXScale(domain: palette)
                         .chartPlotStyle { plot in
                             plot
                                 .padding(.top, 8)
@@ -94,14 +93,14 @@ struct GenreStatsScreen: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 12)   // inner chart padding
+                        .padding(.horizontal, 12)
                     }
-                    .frame(height: 260)            // <<< FIX: give the container a firm height
+                    .frame(height: 260)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 4)
                 // ===============================================================
 
-                // ===== List card ===============================================
+                // ===== Transparent list (no card background) ==================
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(rows, id: \.genre) { row in
                         HStack {
@@ -113,23 +112,20 @@ struct GenreStatsScreen: View {
                                 .foregroundStyle(AppTheme.textSecondary)
                                 .monospacedDigit()
                         }
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 20)
                         .frame(height: 48)
 
                         Divider().overlay(AppTheme.divider)
+                            .padding(.leading, 20)
                     }
                 }
-                .background(AppTheme.card)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 6)
-                .padding(.horizontal, 20)
-                .padding(.top, 8)      // breathe away from chart
-                .padding(.bottom, 72)
-
-                Color.clear.frame(height: 80) // space for dots / tab bar
+                .padding(.top, 8)
+                .padding(.bottom, 80) // enough room for dots + glass tab bar
             }
             .padding(.top, 16)
         }
+        .contentMargins(.bottom, 0, for: .scrollContent)
+        .ignoresSafeArea(.container, edges: .bottom)   // let it extend under the glass bar
         .background(AppTheme.canvas)
         .preferredColorScheme(.light)
     }

@@ -38,7 +38,7 @@ struct RootTabView: View {
             .tag(RootTab.pomoland)
         }
         .tint(AppTheme.bar)
-        .preferredColorScheme(.light) // light mode only for now
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 
