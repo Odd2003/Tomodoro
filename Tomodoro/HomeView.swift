@@ -20,15 +20,18 @@ struct HomeView: View {
     @State var timer: Timer?
     
     @State var rating: Int = 5
-    
     @State var progress: Float = 0.0
     
     @Namespace private var namespace
     
     var songPlayer: AudioService
     
+    // Game stats (SwiftData)
     @Environment(\.modelContext) var context
     @Query var stats: [GameStats]
+
+    // 👇 NEW: Shared statistics store (injected from ContentView)
+    @EnvironmentObject private var store: AppStatsStore
 
     var body: some View {
         Color.milky.overlay {
@@ -52,15 +55,14 @@ struct HomeView: View {
                         .opacity(0.3)
                         .foregroundColor(.black)
                     
-                    // Orange circle
+                    // Orange progress ring
                     Circle()
                         .trim(from: 0.0, to: CGFloat(min(progress, 1.0)))
-                        .stroke(style: StrokeStyle(lineWidth: 25.0,
-                                                   lineCap: .round, lineJoin: .round))
+                        .stroke(
+                            style: StrokeStyle(lineWidth: 25.0, lineCap: .round, lineJoin: .round)
+                        )
                         .foregroundColor(Color.accent)
-                    // Ensures the animation starts from 12 o'clock
-                        .rotationEffect(Angle(degrees: 270))
-                    
+                        .rotationEffect(Angle(degrees: 270)) // start at 12 o’clock
                     
                     Text(String(format: "%02d:%02d", timeRemaining / 60, timeRemaining % 60))
                         .foregroundStyle(.black)
@@ -69,8 +71,6 @@ struct HomeView: View {
                         .contentTransition(.numericText(value: Double(timeRemaining)))
                         .glassEffect(in: .rect(cornerRadius: 16.0))
                         .padding()
-                    
-                    
                 }
                 .padding(.horizontal, 60)
                 
@@ -93,7 +93,6 @@ struct HomeView: View {
                 isSheetVisible.toggle()
             } label: {
                 ZStack {
-                    
                     HStack {
                         HStack {
                             ZStack {
@@ -120,14 +119,10 @@ struct HomeView: View {
                                 if songPlayer.isPlaying {
                                     songPlayer.pause()
                                 } else {
-                                    // If we already have a selected song, resume it from saved time,
-                                    // otherwise do nothing (or select a default song if desired).
                                     if let current = songPlayer.currentSong {
-                                        songPlayer.playSong(name: current) // will resume at saved time
+                                        songPlayer.playSong(name: current)
                                     } else {
-                                        // Optionally choose a default track here if needed
-                                        // e.g., songPlayer.playSong(name: "Good Night")
-                                        songPlayer.resume() // no-op if no player yet
+                                        songPlayer.resume() // no-op if nothing loaded
                                     }
                                 }
                             } label: {
@@ -154,11 +149,9 @@ struct HomeView: View {
                 .matchedTransitionSource(id: "zoom", in: namespace)
             }
             .offset(y: -10)
-            
         }
         .sheet(isPresented: $isSheetVisible) {
             VStack(alignment: .trailing) {
-                
                 Button {
                     isSheetVisible.toggle()
                 } label: {
@@ -169,13 +162,16 @@ struct HomeView: View {
                 .padding(.top, 30)
                 .padding(.trailing, 30)
                 MusicView(songPlayer: songPlayer)
-            }.background(.milky)
-            
+            }
+            .background(.milky)
         }
     }
 
+    // MARK: - Timer control
+    
     func start() {
         isRunning = true
+        timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             if timeRemaining > 0 {
                 withAnimation {
@@ -183,16 +179,27 @@ struct HomeView: View {
                     progress = 1 - (Float(timeRemaining) / Float(isBreak ? breakTime : focusTime))
                 }
             } else {
+                // Capture what segment we just completed
+                let finishedSegmentSeconds = isBreak ? breakTime : focusTime
+
                 stop()
                 
-                if(!isBreak) {
-                    addCharacter()
+                if !isBreak {
+                    // We finished a FOCUS block → log it to Statistics
+                    let genre = currentGenreName()
+                    Task { @MainActor in
+                        store.logCompletedSession(
+                            durationSeconds: finishedSegmentSeconds,
+                            genre: genre,
+                            endedAt: Date()
+                        )
+                    }
+                    addCharacter() // keep your SwiftData reward logic
                 }
                 
-                withAnimation {
-                    isBreak.toggle()
-                }
+                withAnimation { isBreak.toggle() }
                 timeRemaining = isBreak ? breakTime : focusTime
+                progress = 0
                 start()
             }
         }
@@ -201,23 +208,35 @@ struct HomeView: View {
     func stop() {
         isRunning = false
         timer?.invalidate()
+        timer = nil
+    }
+
+    // MARK: - Helpers
+
+    /// Resolve a user-facing genre name from the currently selected song.
+    private func currentGenreName() -> String {
+        if let name = songPlayer.currentSong {
+            let list = SongList()
+            if let g = list.songs.first(where: { $0.name == name })?.genre.rawValue {
+                return g
+            }
+        }
+        // Fallback if no song is selected
+        return "Lo-Fi"
     }
 
     func addCharacter() {
         if let existing = stats.first {
             existing.characterCount += 1
-            
-            if(existing.characterCount == 5) {
+            if existing.characterCount == 5 {
                 existing.goldCharCount += 1
                 existing.characterCount = 0
             }
-            
             try? context.save()
         } else {
-            let firstStats: GameStats = GameStats()
+            let firstStats = GameStats()
             firstStats.characterCount += 1
             context.insert(firstStats)
-            
             try? context.save()
         }
     }
@@ -226,4 +245,3 @@ struct HomeView: View {
 #Preview {
     ContentView().modelContainer(for: GameStats.self, inMemory: true)
 }
-

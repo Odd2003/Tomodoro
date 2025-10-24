@@ -22,6 +22,7 @@ struct StatisticsTabView: View {
                 GenreStatsScreen(vm: vm).tag(1)
             }
             .tabViewStyle(.page(indexDisplayMode: .never)) // hide system dots
+            .ignoresSafeArea(.container, edges: .bottom) //
             .background(AppTheme.canvas.ignoresSafeArea())
 
             PageDots(count: 2, selected: page)

@@ -9,7 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selection = 1
-    @State var songPlayer = AudioService()
+    @State private var songPlayer = AudioService()
+
+    // 👇 shared stats store (persisted)
+    @StateObject private var store = AppStatsStore(preloadDemoData: true)
 
     var body: some View {
         TabView(selection: $selection) {
@@ -18,16 +21,17 @@ struct ContentView: View {
             }
 
             Tab("Home", systemImage: "house", value: 1) {
-                HomeView(songPlayer: songPlayer)
+                HomeView(songPlayer: songPlayer)         // ← keep your Home
             }
 
             Tab("PomoLand", systemImage: "mountain.2", value: 2) {
                 PomoLandView()
             }
         }
+        .tint(AppTheme.bar)
+        .environmentObject(store)                        // 👈 inject globally
+        .preferredColorScheme(.light)
     }
 }
 
-#Preview {
-    ContentView()
-}
+#Preview { ContentView() }

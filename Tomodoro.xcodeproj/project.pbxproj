@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D0D5FF22EABC74C004E8C4D /* CalloutTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D0D5FF12EABC74C004E8C4D /* CalloutTag.swift */; };
 		7D131AD82EA92F650082FDBA /* DailyStatsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D131ACE2EA92F650082FDBA /* DailyStatsScreen.swift */; };
 		7D131AD92EA92F650082FDBA /* StatisticsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D131AD02EA92F650082FDBA /* StatisticsTabView.swift */; };
 		7D131ADA2EA92F650082FDBA /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D131AD62EA92F650082FDBA /* StatsViewModel.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7D0D5FF12EABC74C004E8C4D /* CalloutTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalloutTag.swift; sourceTree = "<group>"; };
 		7D131ACE2EA92F650082FDBA /* DailyStatsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyStatsScreen.swift; sourceTree = "<group>"; };
 		7D131ACF2EA92F650082FDBA /* GenreStatsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreStatsScreen.swift; sourceTree = "<group>"; };
 		7D131AD02EA92F650082FDBA /* StatisticsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsTabView.swift; sourceTree = "<group>"; };
@@ -52,6 +54,7 @@
 				7D131ACE2EA92F650082FDBA /* DailyStatsScreen.swift */,
 				7D131ACF2EA92F650082FDBA /* GenreStatsScreen.swift */,
 				7D131AD02EA92F650082FDBA /* StatisticsTabView.swift */,
+				7D0D5FF12EABC74C004E8C4D /* CalloutTag.swift */,
 			);
 			path = Stats;
 			sourceTree = "<group>";
@@ -172,6 +175,7 @@
 				7D131ADA2EA92F650082FDBA /* StatsViewModel.swift in Sources */,
 				7D131ADB2EA92F650082FDBA /* GenreStatsScreen.swift in Sources */,
 				7D131ADC2EA92F650082FDBA /* RootTabView.swift in Sources */,
+				7D0D5FF22EABC74C004E8C4D /* CalloutTag.swift in Sources */,
 				7D131ADD2EA92F650082FDBA /* PomoLandPlaceholderView.swift in Sources */,
 				7D131ADE2EA92F650082FDBA /* HomePlaceholderView.swift in Sources */,
 			);
