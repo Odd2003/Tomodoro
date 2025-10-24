@@ -53,29 +53,31 @@ struct GenreStatsScreen: View {
                             .foregroundStyle(AppTheme.bar)
                             .cornerRadius(8)
                         }
-                        // average guide
+                        // Average guide + readable bubble (not clipped)
                         .overlay {
                             Chart {
                                 RuleMark(y: .value("Average", average))
                                     .foregroundStyle(AppTheme.textSecondary)
                                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [6, 5]))
-                                    .annotation(position: .leading) {
-                                        Text("avg \(Int(average.rounded())) min")
-                                            .font(.caption2)
-                                            .foregroundStyle(AppTheme.textSecondary)
-                                            .padding(.horizontal, 6)
-                                            .padding(.vertical, 4)
-                                            .background(.black.opacity(0.15), in: .capsule)
+                                    .annotation(position: .top, alignment: .leading) {
+                                        CalloutTag(
+                                            text: "avg \(Int(average.rounded())) min",
+                                            textColor: AppTheme.textSecondary,
+                                            baseOpacity: 1.0
+                                        )
+                                        .font(.caption2)
+                                        .offset(x: -14) // ← nudge inside the plot so it isn’t cut
                                     }
                             }
                         }
                         .chartYScale(domain: 0...Double(yMax))
                         .chartYAxis(.hidden)
-                        .chartXScale(domain: palette)
+                        .chartXScale(domain: palette) // lock categorical order
                         .chartPlotStyle { plot in
                             plot
                                 .padding(.top, 8)
-                                .padding(.horizontal, 8)
+                                .padding(.leading, 16)     // ← extra left room for the bubble
+                                .padding(.trailing, 8)
                         }
                         .chartXAxis {
                             AxisMarks(values: palette) { v in
@@ -93,7 +95,7 @@ struct GenreStatsScreen: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, 12)   // inner chart padding
                     }
                     .frame(height: 260)
                     .padding(.horizontal, 20)
@@ -120,7 +122,7 @@ struct GenreStatsScreen: View {
                     }
                 }
                 .padding(.top, 8)
-                .padding(.bottom, 80) // enough room for dots + glass tab bar
+                .padding(.bottom, 80) // room for dots + glass tab bar
             }
             .padding(.top, 16)
         }
