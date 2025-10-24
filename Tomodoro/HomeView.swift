@@ -151,19 +151,8 @@ struct HomeView: View {
             .offset(y: -10)
         }
         .sheet(isPresented: $isSheetVisible) {
-            VStack(alignment: .trailing) {
-                Button {
-                    isSheetVisible.toggle()
-                } label: {
-                    Image(systemName: "xmark.circle")
-                        .foregroundStyle(Color(.black))
-                        .font(.system(size: 24))
-                }
-                .padding(.top, 30)
-                .padding(.trailing, 30)
                 MusicView(songPlayer: songPlayer)
-            }
-            .background(.milky)
+                .presentationDragIndicator(.visible)
         }
     }
 

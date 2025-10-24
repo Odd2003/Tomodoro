@@ -44,6 +44,7 @@ struct MusicView: View {
                 }
             }
         }
+        .padding(.top, 30)
         .scrollContentBackground(.hidden).background(.milky)
     }
     
