@@ -138,4 +138,6 @@ xcuserdata/
 *.xcworkspace
 !default.xcworkspace
 
+.pbxproj
+
 		# End of https://www.toptal.com/developers/gitignore/api/xcode,swift,macos

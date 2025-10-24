@@ -23,17 +23,17 @@ struct PomoLandView: View {
         
         ZStack {
             
-            Color(red: 0.494, green: 0.788, blue: 0.286).ignoresSafeArea()
+            Color(red: 0.554, green: 0.72, blue: 0.286).ignoresSafeArea()
             
-            ForEach(0..<(stats.first?.characterCount ?? 0), id:\.self) {_ in
+            initIsland()
+            
+            ForEach(0..<(stats.first?.characterCount ?? 0), id: \.self) {_ in
                 
                 let x: CGFloat = CGFloat.random(in: 15...370)
                 let y: CGFloat = CGFloat.random(in: 15...725)
                 let pos: CGPoint = CGPoint(x: x, y: y)
-               
                 
                 Image("TomatoChar").resizable().frame(width: 30, height: 30).position(pos)
-                
                 
             }
             ForEach(0..<(stats.first?.goldCharCount ?? 0), id:\.self) {_ in
@@ -46,11 +46,8 @@ struct PomoLandView: View {
                 
             }
             
-            Button("Add character") {
-                addCharacter()
-            }.buttonStyle(GlassButtonStyle()).position(x: 200, y: 675)
-            
-        }.scaleEffect(zoom).offset(offset)
+        }
+        .scaleEffect(zoom).offset(offset)
             .gesture(
                 SimultaneousGesture(
                     MagnificationGesture().onChanged({ value in
@@ -105,23 +102,47 @@ struct PomoLandView: View {
             )
             .animation(.spring(), value: zoom)
             .animation(.spring(), value: offset)
-        
+           
     }
     
-    func addCharacter() {
-        if let existing = stats.first {
-            existing.characterCount += 1
-            
-            if(existing.characterCount == 5) {
-                existing.goldCharCount += 1
-                existing.characterCount = 0
+    
+    
+    func initIsland() -> some View {
+        
+        let bushPositions: [CGPoint] = [
+            CGPoint(x: 42,  y: 687),
+            CGPoint(x: 358, y: 112),
+            CGPoint(x: 219, y: 703),
+            CGPoint(x: 91,  y: 341),
+            CGPoint(x: 177, y: 496),
+            CGPoint(x: 366, y: 270),
+            CGPoint(x: 144, y: 71),
+            CGPoint(x: 305, y: 657),
+            CGPoint(x: 35,  y: 203),
+            CGPoint(x: 257, y: 592),
+            CGPoint(x: 72,  y: 645),
+            CGPoint(x: 341, y: 188),
+            CGPoint(x: 298, y: 714),
+            CGPoint(x: 119, y: 472),
+        ]
+        let treePositions: [CGPoint] = [
+            CGPoint(x: 82,  y: 705),
+            CGPoint(x: 347, y: 412),
+            CGPoint(x: 291, y: 156),
+            CGPoint(x: 121, y: 523),
+            CGPoint(x: 220, y: 308),
+            CGPoint(x: 59,  y: 98)
+        ]
+        
+        return ZStack {
+            ForEach(bushPositions, id: \.self) {
+                pos in
+                Image("Bush").resizable().frame(width: 40, height: 40).position(pos)
             }
-            
-            try? context.save()
-        } else {
-            let firstStats: GameStats = GameStats()
-            firstStats.characterCount += 1
-            context.insert(firstStats)
+            ForEach(treePositions, id: \.self) {
+                pos in
+                Image("Tree").resizable().frame(width: 60, height: 60).position(pos)
+            }
         }
     }
     

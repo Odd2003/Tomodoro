@@ -9,6 +9,7 @@ let breakTime: Int = 5
 let focusTime: Int = 10
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     @State var isRunning: Bool = false
@@ -23,6 +24,11 @@ struct HomeView: View {
     @State var progress: Float = 0.0
     
     @Namespace private var namespace
+    
+    var songPlayer: AudioService
+    
+    @Environment(\.modelContext) var context
+    @Query var stats: [GameStats]
 
     var body: some View {
         Color.milky.overlay {
@@ -41,12 +47,10 @@ struct HomeView: View {
                     .offset(y: -50)
                 
                 ZStack {
-                    // Gray circle
                     Circle()
                         .stroke(lineWidth: 30.0)
                         .opacity(0.3)
                         .foregroundColor(.black)
-                    //                            .glassEffect(.regular.tint(.orange))
                     
                     // Orange circle
                     Circle()
@@ -80,20 +84,6 @@ struct HomeView: View {
                 .buttonStyle(.glass(.regular.tint(.accent).interactive()))
                 .offset(y: 50)
                 
-                //                Circle()
-                //                    .foregroundColor(.gray)
-                //                    .frame(width: 265, height: 300)
-                //                    .overlay {
-                //                        Button {
-                //                            isRunning ? stop() : start()
-                //                        } label: {
-                //                            Image(systemName: isRunning ? "pause.circle" : "play.circle")
-                //                                .font(.system(size: 100))
-                //                                .foregroundStyle(.accent)                        }
-                //                    }
-                
-                
-                
             }
             .offset(y: -50)
         }
@@ -118,7 +108,7 @@ struct HomeView: View {
                             }
                             .frame(width: 30, height: 30)
                             
-                            Text("Not Playing")
+                            Text(songPlayer.currentSong ?? "Not Playing")
                                 .foregroundStyle(.black)
                                 .font(.system(size: 14))
                         }
@@ -126,9 +116,25 @@ struct HomeView: View {
                         Spacer()
                         
                         HStack {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 24))
-                                .foregroundColor(.black)
+                            Button {
+                                if songPlayer.isPlaying {
+                                    songPlayer.pause()
+                                } else {
+                                    // If we already have a selected song, resume it from saved time,
+                                    // otherwise do nothing (or select a default song if desired).
+                                    if let current = songPlayer.currentSong {
+                                        songPlayer.playSong(name: current) // will resume at saved time
+                                    } else {
+                                        // Optionally choose a default track here if needed
+                                        // e.g., songPlayer.playSong(name: "Good Night")
+                                        songPlayer.resume() // no-op if no player yet
+                                    }
+                                }
+                            } label: {
+                                Image(systemName: songPlayer.isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.black)
+                            }
                             
                             Spacer()
                             
@@ -162,15 +168,8 @@ struct HomeView: View {
                 }
                 .padding(.top, 30)
                 .padding(.trailing, 30)
-                MusicView()
+                MusicView(songPlayer: songPlayer)
             }.background(.milky)
-            
-//            NavigationStack {
-//                MusicView()
-//            }
-//            .matchedTransitionSource(id: "zoom", in: namespace)
-//            .navigationTransition(.zoom(sourceID: "zoom", in: namespace))
-//            .background(.milky)
             
         }
     }
@@ -185,6 +184,11 @@ struct HomeView: View {
                 }
             } else {
                 stop()
+                
+                if(!isBreak) {
+                    addCharacter()
+                }
+                
                 withAnimation {
                     isBreak.toggle()
                 }
@@ -198,15 +202,28 @@ struct HomeView: View {
         isRunning = false
         timer?.invalidate()
     }
+
+    func addCharacter() {
+        if let existing = stats.first {
+            existing.characterCount += 1
+            
+            if(existing.characterCount == 5) {
+                existing.goldCharCount += 1
+                existing.characterCount = 0
+            }
+            
+            try? context.save()
+        } else {
+            let firstStats: GameStats = GameStats()
+            firstStats.characterCount += 1
+            context.insert(firstStats)
+            
+            try? context.save()
+        }
+    }
 }
 
 #Preview {
-    ContentView()
+    ContentView().modelContainer(for: GameStats.self, inMemory: true)
 }
 
-//                        .background(
-//                            Image(systemName: "play.circle")
-//                                .font(.system(size: 100))
-//                                .foregroundStyle(.black)
-//                                .scaleEffect(1.05)
-//                        )
