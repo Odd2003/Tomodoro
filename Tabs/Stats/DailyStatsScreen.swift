@@ -64,8 +64,8 @@ struct DailyStatsScreen: View {
 
                         // Average line + bubble
                         RuleMark(y: .value("Average", average))
-                            .foregroundStyle(.secondary)
-                            .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
+                            .foregroundStyle(Color.gray.opacity(0.6)) // consistent neutral gray
+                                .lineStyle(StrokeStyle(lineWidth: 1, dash: [5, 5]))
                             .annotation(position: .top, alignment: .leading) {
                                 CalloutTag(
                                     text: "avg \(Int(average.rounded())) min",
