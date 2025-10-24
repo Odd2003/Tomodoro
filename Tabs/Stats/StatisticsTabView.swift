@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatisticsTabView: View {
-    @StateObject private var store = AppStatsStore(preloadDemoData: true)
+    @EnvironmentObject private var store: AppStatsStore
     @StateObject private var vm = StatsViewModel()
     @State private var page = 0
 
