@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct TomodoroApp: App {
@@ -13,6 +14,7 @@ struct TomodoroApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(.light)
+                .modelContainer(for: GameStats.self)
         }
     }
 }

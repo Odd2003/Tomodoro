@@ -9,6 +9,7 @@ let breakTime: Int = 5
 let focusTime: Int = 10
 
 import SwiftUI
+import SwiftData
 
 struct HomeView: View {
     @State var isRunning: Bool = false
@@ -25,6 +26,9 @@ struct HomeView: View {
     @Namespace private var namespace
     
     var songPlayer: AudioService
+    
+    @Environment(\.modelContext) var context
+    @Query var stats: [GameStats]
 
     var body: some View {
         Color.milky.overlay {
@@ -180,6 +184,11 @@ struct HomeView: View {
                 }
             } else {
                 stop()
+                
+                if(!isBreak) {
+                    addCharacter()
+                }
+                
                 withAnimation {
                     isBreak.toggle()
                 }
@@ -193,9 +202,28 @@ struct HomeView: View {
         isRunning = false
         timer?.invalidate()
     }
+
+    func addCharacter() {
+        if let existing = stats.first {
+            existing.characterCount += 1
+            
+            if(existing.characterCount == 5) {
+                existing.goldCharCount += 1
+                existing.characterCount = 0
+            }
+            
+            try? context.save()
+        } else {
+            let firstStats: GameStats = GameStats()
+            firstStats.characterCount += 1
+            context.insert(firstStats)
+            
+            try? context.save()
+        }
+    }
 }
 
 #Preview {
-    ContentView()
+    ContentView().modelContainer(for: GameStats.self, inMemory: true)
 }
 
